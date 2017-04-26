@@ -289,7 +289,7 @@ setup(
     long_description = DESC,
 
     # CHANGE THIS
-    license = "PD",
+    license = "Unlicense",
 
     # free-form text field; http://stackoverflow.com/questions/34994130/what-platforms-argument-to-setup-in-setup-py-does
     platforms = ["Linux"],
@@ -305,7 +305,7 @@ setup(
                     "Environment :: Console",
                     "Intended Audience :: Developers",
                     "Intended Audience :: Science/Research",
-                    "License :: Public Domain",  # CHANGE THIS
+                    "License :: Unlicense",  # not a standard classifier; CHANGE THIS
                     "Operating System :: POSIX :: Linux",
                     "Programming Language :: Cython",
                     "Programming Language :: Python",
