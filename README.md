@@ -134,7 +134,7 @@ If you choose to release your package for distribution:
 
 ### License
 
-Public Domain
+[The Unlicense](LICENSE.md)
 
 [setuptools]: https://packaging.python.org/key_projects/#easy-install
 [packaging]: https://packaging.python.org/current/#packaging-tool-recommendations
