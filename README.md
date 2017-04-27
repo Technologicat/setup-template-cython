@@ -8,9 +8,11 @@ Setuptools[[1]][setuptools] has become the tool of choice[[2]][packaging] for pa
 
 For packages to be distributed (especially through [PyPI](https://pypi.python.org/pypi)), setuptools is preferable, since the documentation on distributing packages[[3]][distributing] assumes that is what the developer uses. Also, [setuptools adds dependency resolution](http://stackoverflow.com/questions/25337706/setuptools-vs-distutils-why-is-distutils-still-a-thing) (over distutils), which is an essential feature of `pip`.
 
-This very minimal project documents the author's best guess at current best practices for the packaging and distribution of Cython projects, by piecing together information from various sources (mainly documentation and StackOverflow). Possible corrections, if any, are welcome.
+This very minimal project documents the author's best guess at current best practices for the packaging and distribution of Cython projects, by piecing together information from various sources (mainly documentation and StackOverflow). A pruned-down version for pure Python projects is also provided for comparison. Possible corrections, if any, are welcome.
 
-This is intended as a template for new Cython projects. For completeness, a minimal Cython module is included. This project is placed in the public domain so as to allow its use anywhere.
+This is intended as a template [`setup.py`](setup.py) for new Cython projects. For completeness, a minimal Cython-based example library is included, containing examples of things such as absolute cimports, subpackages, [NumPyDoc](https://github.com/numpy/numpy/blob/master/doc/HOWTO_DOCUMENT.rst.txt) style docstrings, and using [memoryviews](http://cython.readthedocs.io/en/latest/src/userguide/memoryviews.html) for passing arrays (for the last two, see [compute.pyx](mylibrary/compute.pyx)). The example in the [test/](test/) subdirectory demonstrates its usage.
+
+This project is placed under The Unlicense so as to allow its use anywhere. Code snippets based on StackOverflow answers are credited by providing the original links.
 
 This is similar to [simple-cython-example](https://github.com/thearn/simple-cython-example), but different. Here the focus is on numerical scientific projects, where a custom Cython extension (containing all-new code) can bring a large speedup.
 
@@ -57,7 +59,7 @@ For `install`, the switch `--user` may be useful. As can, alternatively, running
 
 #### Binary distributions
 
-As noted in the [Python packaging guide](https://packaging.python.org/distributing/#platform-wheels), PyPI accepts platform wheels (platform-specific binary distributions) for Linux only if they conform to [the `manylinux1` ABI](https://www.python.org/dev/peps/pep-0513/), so running `python setup.py bdist_egg` on an arbitrary development machine is generally not very useful for the purposes of distribution.
+As noted in the [Python packaging guide](https://packaging.python.org/distributing/#platform-wheels), PyPI accepts platform wheels (platform-specific binary distributions) for Linux only if they conform to [the `manylinux1` ABI](https://www.python.org/dev/peps/pep-0513/), so running `python setup.py bdist_wheel` on an arbitrary development machine is generally not very useful for the purposes of distribution.
 
 For the adventurous, PyPA provides [instructions](https://github.com/pypa/manylinux) along with a Docker image.
 

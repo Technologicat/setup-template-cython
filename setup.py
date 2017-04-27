@@ -14,6 +14,10 @@ Usage as usual with setuptools:
 
 For details, see
     http://setuptools.readthedocs.io/en/latest/setuptools.html#command-reference
+or
+    python setup.py --help
+    python setup.py --help-commands
+    python setup.py --help bdist_wheel  # or any command
 """
 
 from __future__ import division, print_function, absolute_import
@@ -163,8 +167,8 @@ def declare_cython_extension(extName, use_math=False, use_openmp=False):
 
 Parameters:
     extName : str
-        Absolute module name, e.g. use `mylibrary.mymodule.submodule`
-        for the Cython source file `mylibrary/mymodule/submodule.pyx`.
+        Absolute module name, e.g. use `mylibrary.mypackage.mymodule`
+        for the Cython source file `mylibrary/mypackage/mymodule.pyx`.
 
     use_math : bool
         If True, set math flags and link with ``libm``.
@@ -253,9 +257,9 @@ except MyFileNotFoundError:
 
 # declare Cython extension modules here
 #
-ext_module_dostuff    = declare_cython_extension( "mylibrary.dostuff",              use_math=False, use_openmp=False )
-ext_module_compute    = declare_cython_extension( "mylibrary.compute",              use_math=True,  use_openmp=False )
-ext_module_helloworld = declare_cython_extension( "mylibrary.submodule.helloworld", use_math=False, use_openmp=False )
+ext_module_dostuff    = declare_cython_extension( "mylibrary.dostuff",               use_math=False, use_openmp=False )
+ext_module_compute    = declare_cython_extension( "mylibrary.compute",               use_math=True,  use_openmp=False )
+ext_module_helloworld = declare_cython_extension( "mylibrary.subpackage.helloworld", use_math=False, use_openmp=False )
 
 # this is mainly to allow a manual logical ordering of the declared modules
 #
@@ -330,7 +334,7 @@ setup(
     #
     # e.g. the keywords your project uses as topics on GitHub, minus "python" (if there)
     #
-    keywords = ["setuptools setup.py template example cython"],
+    keywords = ["setuptools template example cython"],
 
     # All extension modules (list of Extension objects)
     #
@@ -340,7 +344,7 @@ setup(
     #
     # This **does not** automatically recurse into subpackages, so they must also be declared.
     #
-    packages = ["mylibrary", "mylibrary.submodule"],
+    packages = ["mylibrary", "mylibrary.subpackage"],
 
     # Install also Cython headers so that other Cython modules can cimport ours
     #
@@ -348,7 +352,7 @@ setup(
     #    
     # FIXME: force sdist, but sdist only, to keep the .pyx files (this puts them also in the bdist)
     package_data={'mylibrary': ['*.pxd', '*.pyx'],
-                  'mylibrary.submodule': ['*.pxd', '*.pyx']},
+                  'mylibrary.subpackage': ['*.pxd', '*.pyx']},
 
     # Disable zip_safe, because:
     #   - Cython won't find .pxd files inside installed .egg, hard to compile libs depending on this one

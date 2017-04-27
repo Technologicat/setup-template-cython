@@ -122,8 +122,8 @@ def declare_cython_extension(extName, use_math=False, use_openmp=False):
 
 Parameters:
     extName : str
-        Absolute module name, e.g. use `mylibrary.mymodule.submodule`
-        for the Cython source file `mylibrary/mymodule/submodule.pyx`.
+        Absolute module name, e.g. use `mylibrary.mypackage.subpackage`
+        for the Cython source file `mylibrary/mypackage/subpackage.pyx`.
 
     use_math : bool
         If True, set math flags and link with ``libm``.

@@ -3,7 +3,7 @@
 # cython: wraparound  = False
 # cython: boundscheck = False
 # cython: cdivision   = True
-"""Example Cython module."""
+"""Example Cython module for numerical computation mixing libc.math and NumPy."""
 
 from __future__ import division, print_function, absolute_import
 
@@ -42,7 +42,7 @@ Return value:
     cdef int n = x.shape[0]
 
     # np.empty() is a pretty good mechanism for dynamic allocation of arrays,
-    # as long as memory allocation can be done on the Python side,
+    # as long as memory allocation can be done in Python parts of the code (no "nogil").
     #
     # If you absolutely need to dynamically allocate memory in nogil code,
     # then "from libc.stdlib cimport malloc, free", and be ready for pain.
@@ -57,7 +57,7 @@ Return value:
     # can proceed while this one is computing.
     #
     # We could also "cimport cython.parallel" and "for j in cython.parallel.prange(n):"
-    # if we wanted to link this with OpenMP.
+    # if we wanted (and then link this module with OpenMP in setup.py).
     #
     cdef int j
     with nogil:
