@@ -139,6 +139,7 @@ openmp_link_args    = ['-fopenmp']
 # See
 #     https://github.com/cython/cython/wiki/PackageHierarchy
 #
+# For example: my_include_dirs = [np.get_include()]
 my_include_dirs = ["."]
 
 
@@ -162,7 +163,7 @@ else:
     raise ValueError("Unknown build configuration '%s'; valid: 'optimized', 'debug'" % (build_type))
 
 
-def declare_cython_extension(extName, use_math=False, use_openmp=False):
+def declare_cython_extension(extName, use_math=False, use_openmp=False, include_dirs=None):
     """Declare a Cython extension module for setuptools.
 
 Parameters:
@@ -205,6 +206,7 @@ Return value:
                       [extPath],
                       extra_compile_args=compile_args,
                       extra_link_args=link_args,
+                      include_dirs=include_dirs,
                       libraries=libraries
                     )
 
@@ -257,9 +259,9 @@ except MyFileNotFoundError:
 
 # declare Cython extension modules here
 #
-ext_module_dostuff    = declare_cython_extension( "mylibrary.dostuff",               use_math=False, use_openmp=False )
-ext_module_compute    = declare_cython_extension( "mylibrary.compute",               use_math=True,  use_openmp=False )
-ext_module_helloworld = declare_cython_extension( "mylibrary.subpackage.helloworld", use_math=False, use_openmp=False )
+ext_module_dostuff    = declare_cython_extension( "mylibrary.dostuff",               use_math=False, use_openmp=False , include_dirs=my_include_dirs )
+ext_module_compute    = declare_cython_extension( "mylibrary.compute",               use_math=True,  use_openmp=False , include_dirs=my_include_dirs )
+ext_module_helloworld = declare_cython_extension( "mylibrary.subpackage.helloworld", use_math=False, use_openmp=False , include_dirs=my_include_dirs )
 
 # this is mainly to allow a manual logical ordering of the declared modules
 #
