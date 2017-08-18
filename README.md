@@ -125,7 +125,7 @@ If you choose to release your package for distribution:
 
  1. Be sure to use `twine upload`, **not** ~~`python -m setup upload`~~, since the latter may transmit your password in plaintext.  
 
-    Before the first upload of a new project, use `twine register`.  
+    ~~Before the first upload of a new project, use `twine register`.~~ As of August 2017, pre-registration of new packages is no longer needed or supported; just proceed to upload. See [new instructions](https://packaging.python.org/guides/migrating-to-pypi-org/#uploading).  
 
     [Official instructions for twine](https://pypi.python.org/pypi/twine).
 
