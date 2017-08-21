@@ -59,6 +59,22 @@ For `build_ext`, the switch `--inplace` may be useful for one-file throwaway pro
 
 For `install`, the switch `--user` may be useful. As can, alternatively, running the command through `sudo`, depending on your installation.
 
+#### Uninstalling
+
+Sometimes it is useful to uninstall the installed copy of your project (e.g. during development/testing of the install step for a new version). Whereas `setuptools` itself does not know how to uninstall packages, `pip` does. This applies also to `setuptools`-based packages not installed by `pip` itself.
+
+For example, to uninstall `mylibrary` that is provided in this template project:
+
+```bash
+pip uninstall mylibrary
+```
+
+Note that `pip` will automatically check also the user directory (packages installed with `python setup.py install --user`) for the package to uninstall; there is no need to specify any options for that.
+
+Substitute `pip2` or `pip3` for `pip` as needed; run through `sudo` if needed.
+
+To check whether your default `pip` manages your Python 2 or Python 3 packages, use `pip --version`.
+
 #### Binary distributions
 
 As noted in the [Python packaging guide](https://packaging.python.org/distributing/#platform-wheels), PyPI accepts platform wheels (platform-specific binary distributions) for Linux only if they conform to [the `manylinux1` ABI](https://www.python.org/dev/peps/pep-0513/), so running `python setup.py bdist_wheel` on an arbitrary development machine is generally not very useful for the purposes of distribution.
