@@ -59,29 +59,37 @@ For `build_ext`, the switch `--inplace` may be useful for one-file throwaway pro
 
 For `install`, the switch `--user` may be useful. As can, alternatively, running the command through `sudo`, depending on your installation.
 
-#### Uninstalling
-
-Sometimes it is useful to uninstall the installed copy of your project (e.g. during development/testing of the install step for a new version). Whereas `setuptools` itself does not know how to uninstall packages, `pip` does. This applies also to `setuptools`-based packages not installed by `pip` itself.
-
-For example, to uninstall `mylibrary` that is provided in this template project:
-
-```bash
-pip uninstall mylibrary
-```
-
-Note that `pip` will automatically check also the user directory (packages installed with `python setup.py install --user`) for the package to uninstall; there is no need to specify any options for that.
-
-Substitute `pip2` or `pip3` for `pip` as needed; run through `sudo` if needed.
-
-To check whether your default `pip` manages your Python 2 or Python 3 packages, use `pip --version`.
-
-#### Binary distributions
+#### Linux binaries
 
 As noted in the [Python packaging guide](https://packaging.python.org/distributing/#platform-wheels), PyPI accepts platform wheels (platform-specific binary distributions) for Linux only if they conform to [the `manylinux1` ABI](https://www.python.org/dev/peps/pep-0513/), so running `python setup.py bdist_wheel` on an arbitrary development machine is generally not very useful for the purposes of distribution.
 
 For the adventurous, PyPA provides [instructions](https://github.com/pypa/manylinux) along with a Docker image.
 
 For the less adventurous, just make an sdist and upload that; scientific Linux users are likely not scared by an automatic compilation step.
+
+#### Uninstalling
+
+Sometimes it is useful to uninstall the installed copy of your package, such as during the development and testing of the install step for a new version.
+
+Whereas `setuptools` does not know how to uninstall packages, `pip` does. This applies also to `setuptools`-based packages not installed by `pip` itself.
+
+For example, to uninstall this template project (if you have installed it):
+
+```bash
+pip uninstall setup-template-cython
+```
+
+The package name is the `name` argument provided to `setup()` in `setup.py`.
+
+Note that, when you invoke the command, if the current working directory of your terminal has a subdirectory with the same name as the package to be uninstalled (here `setup-template-cython`), its presence will mask the package, which is probably not what you want.
+
+If you have installed several versions of the package manually, the above command will uninstall only the most recent version. In this case, invoke the command several times until it reports that setup-template-cython is not installed.
+
+Note that `pip` will automatically check also the user directory of the current user (packages installed with `python setup.py install --user`) for the package to uninstall; there is no need to specify any options for that.
+
+Substitute `pip2` or `pip3` for `pip` as needed; run through `sudo` if needed.
+
+To check whether your default `pip` manages your Python 2 or Python 3 packages, use `pip --version`.
 
 
 ### Notes
@@ -150,6 +158,25 @@ If you choose to release your package for distribution:
     For example, keep in mind that `pip` has replaced `ez_setup`, and nowadays `pip` (in practice) comes with Python.  
 
     Many Python distribution tools have been sidelined by history, or merged back into the supported ones (see [the StackOverflow answer already linked above](http://stackoverflow.com/a/14753678)). Distutils and setuptools remain, nowadays [fulfilling different roles](http://stackoverflow.com/a/40176290).
+
+
+### Compatibility
+
+Tested on Linux Mint, Python 2.7 and 3.4.
+
+On Mac OS, the `data_files` directive of `setup.py` may cause trouble, if the `setuptools` prefix is set to `/usr/local` (or similar). In this case, `setuptools` may try to install `test/*` as `/usr/local/test/*`, which will likely fail.
+
+Not tested on Windows (please send feedback, e.g. by opening an issue).
+
+#### Platform-specific notes
+
+On **Linux Mint**:
+
+ - The package installs into a subdirectory of the base install location, with a name following the format `setup_template_cython-0.1.4-py3.4-linux-x86_64.egg`. The `mylibrary` and `test` subdirectories appear under that, as does this README.
+ - with `python3 setup.py install --user`, the base install location is `$HOME/.local/lib/python3.4/site-packages/`.
+ - with `sudo python3 setup.py install`, the base install location is `/usr/local/lib/python3.4/dist-packages/`.
+
+Then, in Python, `import mylibrary` will import the library. The `test` subdirectory of the project is harmless; `import test` will still import Python's own `test` module.
 
 
 ### License
