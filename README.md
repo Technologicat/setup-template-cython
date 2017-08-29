@@ -49,7 +49,7 @@ See the [setuptools manual](http://setuptools.readthedocs.io/en/latest/setuptool
 ```bash
 python setup.py build_ext
 python setup.py build    # copies .py files in the Python packages
-python setup.py install  # will automatically "build" and "bdist"
+python setup.py install  # will automatically "build" and "bdist" first
 python setup.py sdist
 ```
 
@@ -58,6 +58,34 @@ Substitute `python2` or `python3` for `python` if needed.
 For `build_ext`, the switch `--inplace` may be useful for one-file throwaway projects, but packages to be installed are generally much better off by letting setuptools create a `build/` subdirectory.
 
 For `install`, the switch `--user` may be useful. As can, alternatively, running the command through `sudo`, depending on your installation.
+
+#### Non-package data files
+
+*Non-package data files* are files in the project that are to be distributed, but do not belong to any Python package. In practice, this usually means documentation and usage examples.
+
+Because non-package data files arguably have no natural binary-install location, any `data_files` with relative paths [will install under *prefix*](https://stackoverflow.com/questions/24727709/i-dont-understand-python-manifest-in#comment46482024_24727824). **Importantly**, the default Python environments in different operating systems may set *prefix* differently.
+
+For example, on Linux Mint, each Python package gets its own prefix, whereas Mac OS uses one common prefix for all Python packages. Thus, on Mac OS, if the `setuptools` prefix is set to `/usr/local` (which is typical), then `setuptools` will try to install e.g. the `data_files` specified as `test/*` into `/usr/local/test/*`, which will fail (for good reason).
+
+It may be better to package non-package data files only into the source distribution (sdist). On what gets included into the sdist by default, refer to [the documentation](https://docs.python.org/3/distutils/sourcedist.html).
+
+The consensus seems to be that the `package_data` option of `setup()` [behaves unintuitively](http://blog.codekills.net/2011/07/15/lies,-more-lies-and-python-packaging-documentation-on--package_data-/), and that the recommended way to include non-package data files into the sdist is to list them in a separate file called the manifest template, `MANIFEST.in`.
+
+#### MANIFEST.in
+
+For an overview, see this [quick explanation](https://stackoverflow.com/questions/24727709/i-dont-understand-python-manifest-in). For available commands, see the (very short) [documentation](https://docs.python.org/3/distutils/commandref.html#sdist-cmd).
+
+Simple example `MANIFEST.in`:
+
+```
+include *.md
+include doc/*.txt
+exclude test/testing_an_idea.py
+```
+
+On each line in this example, the argument is a shellglob. Relative paths start from the directory where `setup.py` and `MANIFEST.in` are located.
+
+Files listed in `MANIFEST.in` can also be [marked for installation](http://blog.cykerway.com/posts/2016/10/14/install-package-data-with-setuptools.html) (which implies also binary distribution), via setting `include_package_data = True` in the parameters to `setup()`. This requires that those particular files reside inside a Python package, so that they will have a location to install into.
 
 #### Linux binaries
 
@@ -139,7 +167,7 @@ To check whether your default `pip` manages your Python 2 or Python 3 packages, 
 
 If you choose to release your package for distribution:
 
- 0. See the [distributing](https://packaging.python.org/distributing/) section of the packaging guide, and especially the subsection on [uploading to PyPI](https://packaging.python.org/distributing/#uploading-your-project-to-pypi).  
+ 0. See the [distributing](https://packaging.python.org/distributing/) section of the packaging guide, and especially the subsection on [uploading to PyPI](https://packaging.python.org/distributing/#uploading-your-project-to-pypi). A short summary of key terms can also be found in the Python documentation on [distributing Python modules](https://docs.python.org/3/distributing/index.html).  
 
     Especially if your package has dependencies, it is important to get at least an sdist onto PyPI to make the package easy to install (via `pip install`).  
 
@@ -164,7 +192,7 @@ If you choose to release your package for distribution:
 
 Tested on Linux Mint, Python 2.7 and 3.4.
 
-On Mac OS, the `data_files` directive of `setup.py` may cause trouble, if the `setuptools` prefix is set to `/usr/local` (or similar). In this case, `setuptools` may try to install `test/*` as `/usr/local/test/*`, which will likely fail.
+On Mac OS, the `data_files` approach used here will not work; `MANIFEST.in` is recommended instead. See the section above on **non-package data files**. Since this is an overall better approach, this project may be later updated to use it instead.
 
 Not tested on Windows (please send feedback, e.g. by opening an issue).
 
