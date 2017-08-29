@@ -67,13 +67,13 @@ Because non-package data files arguably have no natural binary-install location,
 
 For example, on Linux Mint, each Python package gets its own prefix, whereas Mac OS uses one common prefix for all Python packages. Thus, on Mac OS, if the `setuptools` prefix is set to `/usr/local` (which is typical), then `setuptools` will try to install e.g. the `data_files` specified as `test/*` into `/usr/local/test/*`, which will fail (for good reason).
 
-It may be better to package non-package data files only into the source distribution (sdist). On what gets included into the sdist by default, refer to [the documentation](https://docs.python.org/3/distutils/sourcedist.html).
+It is better to package non-package data files only into the source distribution (sdist). On what gets included into the sdist by default, refer to [the documentation](https://docs.python.org/3/distutils/sourcedist.html).
 
 The consensus seems to be that the `package_data` option of `setup()` [behaves unintuitively](http://blog.codekills.net/2011/07/15/lies,-more-lies-and-python-packaging-documentation-on--package_data-/), and that the recommended way to include non-package data files into the sdist is to list them in a separate file called the manifest template, `MANIFEST.in`.
 
 #### MANIFEST.in
 
-For an overview, see this [quick explanation](https://stackoverflow.com/questions/24727709/i-dont-understand-python-manifest-in). For available commands, see the (very short) [documentation](https://docs.python.org/3/distutils/commandref.html#sdist-cmd).
+Write a `MANIFEST.in` to include non-package data files in your sdist. For an overview, see this [quick explanation](https://stackoverflow.com/questions/24727709/i-dont-understand-python-manifest-in). For available commands, see the (very short) [documentation](https://docs.python.org/3/distutils/commandref.html#sdist-cmd).
 
 Simple example `MANIFEST.in`:
 
@@ -83,9 +83,11 @@ include doc/*.txt
 exclude test/testing_an_idea.py
 ```
 
-On each line in this example, the argument is a shellglob. Relative paths start from the directory where `setup.py` and `MANIFEST.in` are located.
+In this example, the argument on each line is a shellglob. Relative paths start from the directory where `setup.py` and `MANIFEST.in` are located.
 
-Files listed in `MANIFEST.in` can also be [marked for installation](http://blog.cykerway.com/posts/2016/10/14/install-package-data-with-setuptools.html) (which implies also binary distribution), via setting `include_package_data = True` in the parameters to `setup()`. This requires that those particular files reside inside a Python package, so that they will have a location to install into.
+The set of files included by `MANIFEST.in` can also be [marked for installation](http://blog.cykerway.com/posts/2016/10/14/install-package-data-with-setuptools.html) (which implies also binary distribution), via setting `include_package_data = True` in the parameters to `setup()`. This requires that any files to be installed reside inside a Python package, so that they will have a location to install into. This can be used e.g. for binary data files that your library uses internally.
+
+When `include_package_data` is enabled, everything that was included by `MANIFEST.in` and is possible to install will be installed. As far as binary distribution and installation are concerned, any non-package data files included by `MANIFEST.in` will be simply ignored. The sdist will be processed as normal; the `include_package_data` setting only concerns binary distribution and installation.
 
 #### Linux binaries
 
