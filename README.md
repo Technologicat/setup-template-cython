@@ -59,21 +59,56 @@ For `build_ext`, the switch `--inplace` may be useful for one-file throwaway pro
 
 For `install`, the switch `--user` may be useful. As can, alternatively, running the command through `sudo`, depending on your installation.
 
-#### Non-package data files
+#### Packaging data files
 
-*Non-package data files* are files in the project that are to be distributed, but do not belong to any Python package. In practice, this usually means documentation and usage examples.
+From the viewpoint of Python packaging, data files in your project come in two varieties:
 
-Because non-package data files arguably have no natural binary-install location, any `data_files` with relative paths [will install under *prefix*](https://stackoverflow.com/questions/24727709/i-dont-understand-python-manifest-in#comment46482024_24727824). **Importantly**, the default Python environments in different operating systems may set *prefix* differently.
+ - **Non-package data files** are files in the project that are to be distributed, but do not belong to any Python package. Typically, this means end-user documentation and usage examples.
+ - **Package data** are data files inside Python packages. Typically, these files can be binary data needed by your library (to be loaded at runtime via the `pkg_resources` API), or developer documentation on a particular package.
 
-For example, on Linux Mint, each Python package gets its own prefix, whereas Mac OS uses one common prefix for all Python packages. Thus, on Mac OS, if the `setuptools` prefix is set to `/usr/local` (which is typical), then `setuptools` will try to install e.g. the `data_files` specified as `test/*` into `/usr/local/test/*`, which will fail (for good reason).
+Non-package data files arguably have no natural binary-install location, unless they are specified with an absolute target path. Any `data_files` specified with relative paths [will install directly under *prefix*](https://stackoverflow.com/questions/24727709/i-dont-understand-python-manifest-in#comment46482024_24727824). **Importantly**, Python environments in different operating systems may set their default *prefix* differently.
 
-It is better to package non-package data files only into the source distribution (sdist). On what gets included into the sdist by default, refer to [the documentation](https://docs.python.org/3/distutils/sourcedist.html).
+For example, it seems that on Linux Mint, each Python package gets its own prefix, whereas Mac OS uses one common prefix for all Python packages. Thus, on Mac OS, if the `setuptools` prefix is set to `/usr/local` (which is typical), then `setuptools` will try to install e.g. the `data_files` specified as `test/*` into `/usr/local/test/*`, which will fail (for good reason).
 
-The consensus seems to be that the `package_data` option of `setup()` [behaves unintuitively](http://blog.codekills.net/2011/07/15/lies,-more-lies-and-python-packaging-documentation-on--package_data-/), and that the recommended way to include non-package data files into the sdist is to list them in a separate file called the manifest template, `MANIFEST.in`.
+For non-package data files, it is better to package them only into the source distribution (sdist). On what gets included into the sdist by default, refer to [the documentation](https://docs.python.org/3/distutils/sourcedist.html). GitHub users specifically note that `README.txt` gets included, but `README.md` does not.
 
-#### MANIFEST.in
+The consensus seems to be that the `package_data` option of `setup()` [behaves unintuitively](http://blog.codekills.net/2011/07/15/lies,-more-lies-and-python-packaging-documentation-on--package_data-/). For a long time, it was meant [only for binary distributions and installation](https://stackoverflow.com/questions/7522250/how-to-include-package-data-with-setuptools-distribute), and was ignored for the sdist. However, the documentation says that [in Python 3.1+](https://docs.python.org/3/distutils/setupscript.html#installing-package-data) (and [also in 2.7](https://docs.python.org/2/distutils/setupscript.html#installing-package-data)), all files specified as `package_data` will be included also into the sdist, **but only if no manifest template is provided**.
 
-Write a `MANIFEST.in` to include non-package data files in your sdist. For an overview, see this [quick explanation](https://stackoverflow.com/questions/24727709/i-dont-understand-python-manifest-in). For available commands, see the (very short) [documentation](https://docs.python.org/3/distutils/commandref.html#sdist-cmd).
+The manifest template, often also called `MANIFEST.in`, is an optional, separate configuration file for `setuptools` that controls the contents of the sdist. It can be used to include additional files (both package and non-package data), and to exclude any undesired files that would be included in the sdist by default. Historically, this was the way to control the contents of the sdist; now, confusingly, it can also be used to include files in binary distributions and installation (see below).
+
+#### `data_files` vs. `package_data` vs. `MANIFEST.in`?
+
+**`data_files`**:
+
+ - Meant for non-package data files.
+ - Will cause `setuptools` to try to install the files, which may cause problems depending on the configuration of the Python environment (specifically *prefix*). Mac OS users beware.
+ - May have some limited use, if an absolute target path for installation is applicable.
+
+**`package_data`**:
+
+ - Historically, main way to control binary distributions and installation. Now also controls sdist **if you don't provide** a `MANIFEST.in`.
+ - Meant for package data only. Non-package data files (such as `README.md`!) need a different mechanism.
+ - The paths to the data files are specified as relative to each package in question. See the example in [`setup.py`](setup.py) of this template project.
+
+**`MANIFEST.in`**:
+
+ - Historically, main way to control sdist. Now also controls binary distributions and installation, **if you set the option** `include_package_data` in your parameters to `setup()`.
+ - If this file is present, it overrides `package_data` for sdist.
+ - If `include_package_data` is set, any package data included by `MANIFEST.in` will also get binary-packaged and installed. Any non-package data files will be ignored. On the sdist, the option `include_package_data` has no effect.
+ - All files included by `MANIFEST.in` will in any case get included into the sdist.
+ - The paths to the data files are specified as relative to the directory `setup.py` and `MANIFEST.in` reside in.
+
+**`package_data` + `MANIFEST.in`**:
+
+ - For creating source and binary distributions completely independently of each other. Be careful.
+ - Files specified as `package_data` are included into binary distributions and installation.
+ - Files included by `MANIFEST.in` are included into the sdist.
+ - The `setup()` option `include_package_data` **must not** be set.
+
+
+#### Format of `MANIFEST.in`
+
+For an overview, see this [quick explanation](https://stackoverflow.com/questions/24727709/i-dont-understand-python-manifest-in). For available commands, see the (very short) [documentation](https://docs.python.org/3/distutils/commandref.html#sdist-cmd).
 
 Simple example `MANIFEST.in`:
 
@@ -83,7 +118,7 @@ include doc/*.txt
 exclude test/testing_an_idea.py
 ```
 
-In this example, the argument on each line is a shellglob. Relative paths start from the directory where `setup.py` and `MANIFEST.in` are located.
+In this example, the argument on each line is a shellglob. In `MANIFEST.in`, relative paths start from the directory where `setup.py` and `MANIFEST.in` are located.
 
 The set of files included by `MANIFEST.in` can also be [marked for installation](http://blog.cykerway.com/posts/2016/10/14/install-package-data-with-setuptools.html) (which implies also binary distribution), via setting `include_package_data = True` in the parameters to `setup()`. This requires that any files to be installed reside inside a Python package, so that they will have a location to install into. This can be used e.g. for binary data files that your library uses internally.
 
@@ -194,7 +229,7 @@ If you choose to release your package for distribution:
 
 Tested on Linux Mint, Python 2.7 and 3.4.
 
-On Mac OS, the `data_files` approach used here will not work; `MANIFEST.in` is recommended instead. See the section above on **non-package data files**. Since this is an overall better approach, this project may be later updated to use it instead.
+On Mac OS, the `data_files` approach used in the example will not work, because all Python packages share the same prefix.
 
 Not tested on Windows (please send feedback, e.g. by opening an issue).
 
