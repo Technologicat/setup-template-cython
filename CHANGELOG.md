@@ -1,3 +1,8 @@
+## [v0.1.5] - README update edition
+ - reorganize README to improve clarity
+ - improve documentation on packaging data files
+ - add package uninstallation instructions
+
 ## [v0.1.4]
  - merge pull request from samuelsmal, fixing include path issues
  - update instructions in README, related to PyPI migration
